@@ -1,31 +1,33 @@
+/* Phần khai báo */
 const express = require('express');
-const cors = require("cors");
 const { createServer } = require('node:http');
 const { Server } = require('socket.io');
 const { join } = require('node:path');
+
+
 const { connectDB } = require('./config/database');
-
-
-
 require('dotenv').config();
-
 const router = require('./routes');
-
 const PORT = process.env.PORT || 3200;
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost/chatApp';
 const SECRET_KEY = process.env.SECRET_KEY || 'mysecretkey';
 
-const app = express();
-connectDB();
-const server = createServer(app);
 
-const io = new Server(server, {
+const app = express();
+var server = createServer(app);
+
+var io = require("socket.io")(server, {
     cors: {
-        origin: "http://localhost:3000",
+        origin: "*",
         methods: ["GET", "POST"],
     }
 });
 
+connectDB();
+
+// middleware
+app.use(express.json());
+app.use(cors());
 app.use('/api', router);
 
 io.on('connection', (socket) => {
