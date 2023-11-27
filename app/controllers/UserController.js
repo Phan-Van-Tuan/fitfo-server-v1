@@ -1,51 +1,70 @@
-const User = require("../modela/User");
+const { generateAccessToken, decodeAccessToken } = require('../helpers/jwt');
+const UserModel = require('../models/UserModel');
+const validator = require('validator');
 const bcrypt = require('bcrypt');
-const { generateAccessToken, decodeAccessToken } = require('../helpers/jwt')
-const saltRounds = 3;
 
 class UserController {
   async register(req, res) {
-    const { name, email, password } = req.body;
-    bcrypt.hash(password.toString(), saltRounds, async function(err, hash) {
-      const response = await User.create({
-        name,
-        email,
-        password: hash
-      })
-      res.json(response);
-    });
-    
-    
-  }
-  async login(req, res) {
-    const {email, password} = req.body;
+    try {
+      const { name, phoneNumber, email, password } = req.body;
 
-    const user = await User.findOne({ email: email}).exec();
-    if(!user) {
-      res.status(401).json({
-        message: "Login Failed"
-      })
-      return
+      let user = await UserModel.findOne({ phoneNumber });
+
+      // Validate
+      if (user)
+        return res.status(400).json("The user with the given phone number already exist...");
+
+      if (!name || !password || !phoneNumber)
+        return res.status(400).json("All fields are required...");
+
+      if (!validator.isMobilePhone(phoneNumber, 'any', { strictMode: false }))
+        return res.status(400).json("Phone number must be a valid phone number...");
+
+      if (!validator.isEmail(email))
+        return res.status(400).json("Email must be a valid email...");
+
+      if (!validator.isStrongPassword(password))
+        return res.status(400).json("Password must be a strong password...");
+
+      user = new UserModel({ name, phoneNumber, email, password });
+
+      const salt = await bcrypt.genSalt(10);
+      user.password = await bcrypt.hash(user.password, salt);
+
+      await user.save();
+
+      const token = generateAccessToken(user._id);
+
+      res.status(200).json({ id: user._id, name, phoneNumber, email, token });
+
+    } catch (error) {
+      console.log(error);
+      res.status(500).json('error');
     }
+  }
 
-    const { password: hash} = user;
-    bcrypt.compare(password, hash, function(err, result) {
-      if(result) {
-        const accessToken = generateAccessToken({
-          email: user.email,
-          name: user.name,
-        });
+  async login(req, res) {
+    try {
+      const { phoneNumber, password } = req.body;
 
-        res.json({ status: result , accessToken: accessToken});
-        return;
-      }
+      const user = await UserModel.findOne({ phoneNumber });
 
-      res.status(401).json({
-        code: 401,
-        message: "Login Failed"
-      });
+      if (!user)
+        return res.status(401).json("Login Failed");
 
-  });
+      const isValidPassword = await bcrypt.compare(password, user.password);
+
+      if (!isValidPassword)
+        return res.status(401).json("Invalid email or password");
+
+      const token = generateAccessToken(user._id)
+
+      res.status(200).json({ id: user._id, name: user.name, phoneNumber: user.phoneNumber, token });
+
+    } catch (error) {
+      console.log(error)
+      res.status(500).json('error')
+    }
   }
 
   async profile(req, res) {
@@ -53,9 +72,58 @@ class UserController {
     if (bearerToken) {
       const accessToken = bearerToken.replace("Bearer", "").trim();
       const decode = decodeAccessToken(accessToken)
-      res.json({decode});
+      res.json({ decode });
     }
   }
+
+  async update(req, res) {
+    try {
+      // Logic to update a user by ID in the database
+      // Example using Mongoose:
+      await UserModel.findByIdAndUpdate(req.params.id, req.body, { new: true });
+      // res.json(updatedUser);
+      // const userId = req.params.id;
+      // res.send(`Update user with ID ${userId}`);
+      res.status(200).json({ message: 'Update user succeed' });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: 'Internal Server Error' });
+    }
+  }
+
+  async delete(req, res) {
+    try {
+      await UserModel.findByIdAndDelete(req.params.id);
+      res.status(200).json({ message: 'Delete user succeed' });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: 'Internal Server Error' });
+    }
+  }
+
+  async getUserById(req, res) {
+    try {
+      const userId = req.params.id;
+      const user = await UserModel.findById(userId);
+      res.status(200).json({ id: user._id, name: user.name, phoneNumber: user.phoneNumber });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: 'Internal Server Error' });
+    }
+  }
+
+  async getAllUsers(req, res) {
+    try {
+      // Logic to get all users from the database
+      // Example using Mongoose:
+      const users = await UserModel.find();
+      res.status(200).json(users);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: 'Internal Server Error' });
+    }
+  }
+
 };
 
 module.exports = new UserController;

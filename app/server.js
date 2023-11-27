@@ -8,9 +8,9 @@ const cors = require('cors');
 // Load environment variables from a .env file
 require('dotenv').config();
 // Import database connection function
-const { connect } = require('./config/database');
+const connectDB = require('./config/connectDB');
 // Import routes module
-// const router = require('./routes');
+const router = require('./routes');
 
 // Get ... from environment variables
 const PORT = process.env.PORT || 3200;
@@ -31,12 +31,12 @@ var io = require("socket.io")(server, {
 });
 
 // Connect to MongoDB using the provided URI
-connect(MONGODB_URI);
+connectDB(MONGODB_URI);
 
 // Middleware setup
 app.use(express.json());  // Parse incoming JSON requests
 app.use(cors());  // Enable Cross-Origin Resource Sharing
-// app.use('/api', router);  // Define routes under the '/api' endpoint
+app.use('/api', router);  // Define routes under the '/api' endpoint
 
 // Socket.IO event handling for real-time communication
 io.on('connection', (socket) => {
