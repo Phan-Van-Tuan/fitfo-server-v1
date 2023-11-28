@@ -1,6 +1,6 @@
 // Import necessary modules and libraries
 const express = require('express');
-const { createServer } = require('node:http');
+const { createServer } = require('http');
 const { initSocket } = require('./sockets/chatSocket.js'); // Điều chỉnh đường dẫn nếu cần thiết
 const { join } = require('node:path');
 const cors = require('cors');
