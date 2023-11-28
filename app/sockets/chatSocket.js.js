@@ -1,45 +1,56 @@
-const socketIO = require('socket.io');
+let onlineUsers = [];
 
 function initSocket(server) {
-    const io = socketIO(server);
+    // Create a Socket.IO instance and configure CORS
+    var io = require("socket.io")(server, {
+        cors: {
+            origin: "*",
+            methods: ["GET", "POST"],
+        }
+    });
 
+    // Socket.IO event handling for real-time communication
     io.on('connection', (socket) => {
-        console.log(`A user connected: ${socket.id}`);
 
-        // Xử lý sự kiện khi một tin nhắn được gửi
-        socket.on('chatMessage', (data) => {
-            console.log(`Received message from ${socket.id}: ${data.message}`);
+        // Listen to a connection
+        console.log("new connection ", socket.id);
+        socket.on('addNewUser', (userId) => {
+            !onlineUsers.some((user) => user.userId === userId) &&
+                onlineUsers.push({
+                    userId,
+                    socketId: socket.id,
+                });
 
-            // Gửi tin nhắn đến tất cả các kết nối khác
-            io.emit('chatMessage', { userId: socket.id, message: data.message });
+            console.log('onlineUsers', onlineUsers);
+
+            io.emit('getOnlineUsers', onlineUsers);
+        })
+
+        // Add message
+        socket.on('sendMessage', (message) => {
+            const user = onlineUsers.find(
+                (user) => user.userId === message.recipientId
+            );
+
+            if (user) {
+                io.to(user.socketId).emit('getMessage', message);
+                io.to(user.socketId).emit('getNotification', {
+                    senderId: message.senderId,
+                    isRead: false,
+                    date: new Date(),
+                });
+            }
+            
         });
 
         // Xử lý sự kiện khi người dùng ngắt kết nối
         socket.on('disconnect', () => {
-            console.log(`User disconnected: ${socket.id}`);
+            onlineUsers = onlineUsers.filter((user) => user.socketId !== socket.id);
+
+            io.emit('getOnlineUsers', onlineUsers);
         });
     });
+
 }
 
 module.exports = { initSocket };
-
-// // Create a Socket.IO instance and configure CORS
-// var io = require("socket.io")(server, {
-//     cors: {
-//         origin: "*",
-//         methods: ["GET", "POST"],
-//     }
-// });
-
-// // Socket.IO event handling for real-time communication
-// io.on('connection', (socket) => {
-//     // Handle 'join_room' event - join a specific room
-//     socket.on('join_room', (data) => {
-//         socket.join(data);
-//     });
-
-//     // Handle 'send_message' event - broadcast message to a specific room
-//     socket.on('send_message', (data) => {
-//         socket.to(data.room).emit("receive_message", data);
-//     });
-// });

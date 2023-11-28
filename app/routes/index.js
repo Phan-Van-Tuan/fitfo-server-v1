@@ -15,6 +15,6 @@ router.use('/messages/', (req, res) => { res.status(200).json("hello! this is me
 router.use('/users/', userRouter);
 router.use('/users/', (req, res) => { res.status(200).json("hello! this is user router") });
 
-router.use('/', (req, res) => { res.status(200).json("hello! this is respon message by API FITFO") });
+router.use('/', (req, res) => { res.status(200).send('Welcome to fitfo API') });
 
 module.exports = router;

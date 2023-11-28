@@ -20,7 +20,27 @@ const app = express();
 // Create an HTTP server using the Express app
 var server = createServer(app);
 
+// Create a Socket.IO instance and configure CORS
+// var io = require("socket.io")(server, {
+//     cors: {
+//         origin: "*",
+//         methods: ["GET", "POST"],
+//     }
+// });
+
 initSocket(server);
+// Socket.IO event handling for real-time communication
+// io.on('connection', (socket) => {
+//     // Handle 'join_room' event - join a specific room
+//     socket.on('join_room', (data) => {
+//         socket.join(data);
+//     });
+
+//     // Handle 'send_message' event - broadcast message to a specific room
+//     socket.on('send_message', (data) => {
+//         socket.to(data.room).emit("receive_message", data);
+//     });
+// });
 
 // Connect to MongoDB
 connectDB();
