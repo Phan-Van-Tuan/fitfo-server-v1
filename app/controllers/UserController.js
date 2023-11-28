@@ -1,5 +1,5 @@
+const UserModel = require('../models/UserModel');
 const { generateAccessToken, decodeAccessToken } = require('../helpers/jwt');
-const UserModel = require('../models/UserModel.js');
 const validator = require('validator');
 const bcrypt = require('bcrypt');
 
