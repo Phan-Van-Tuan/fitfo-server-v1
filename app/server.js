@@ -2,7 +2,7 @@
 const express = require('express');
 const { createServer } = require('http');
 const { initSocket } = require('./sockets/chatSocket.js'); // Điều chỉnh đường dẫn nếu cần thiết
-const { join } = require('node:path');
+// const { join } = require('node:path');
 const cors = require('cors');
 
 // Load environment variables from a .env file
