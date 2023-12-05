@@ -1,5 +1,7 @@
 APP CHAT API
 
+- https://fitfo-api.onrender.com/api/
+
 # API
 
     - test API:             [GET] http://localhost:3200/api/...
@@ -10,7 +12,8 @@ APP CHAT API
     - my profile:           [GET] http://localhost:3200/api/users/profile
     - delete:               [DELETE] http://localhost:3200/api/users/delete/:id
     - update:               [PUT] http://localhost:3200/api/users/update/:id
-    - get user:             [GET] http://localhost:3200/api/users/getUserById
+    - get user by Id:       [GET] http://localhost:3200/api/users/getUserById
+    - get user by name:     [GET] http://localhost:3200/api/users/getUserByPhoneNumber
     - get all users:        [GET] http://localhost:3200/api/users/getAllUsers
 
     - create message:       [POST] http://localhost:3200/api/messages/

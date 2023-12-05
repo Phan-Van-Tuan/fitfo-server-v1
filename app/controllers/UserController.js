@@ -1,5 +1,5 @@
-const { generateAccessToken, decodeAccessToken } = require('../helpers/jwt');
 const UserModel = require('../models/UserModel');
+const { generateAccessToken, decodeAccessToken } = require('../helpers/jwt');
 const validator = require('validator');
 const bcrypt = require('bcrypt');
 
@@ -12,19 +12,19 @@ class UserController {
 
       // Validate
       if (user)
-        return res.status(400).json("The user with the given phone number already exist...");
+        return res.status(400).json({ error: "The user with the given phone number already exist..." });
 
       if (!name || !password || !phoneNumber)
-        return res.status(400).json("All fields are required...");
+        return res.status(400).json({ error: "All fields are required..." });
 
-      if (!validator.isMobilePhone(phoneNumber, 'any', { strictMode: false }))
-        return res.status(400).json("Phone number must be a valid phone number...");
+      if (!validator.isMobilePhone(phoneNumber, 'vi-VN', { strictMode: false }))
+        return res.status(400).json({ error: "Phone number must be a valid phone number..." });
 
       if (!validator.isEmail(email))
-        return res.status(400).json("Email must be a valid email...");
+        return res.status(400).json({ error: "Email must be a valid email..." });
 
       if (!validator.isStrongPassword(password))
-        return res.status(400).json("Password must be a strong password...");
+        return res.status(400).json({ error: "Password must be a strong password..." });
 
       user = new UserModel({ name, phoneNumber, email, password });
 
@@ -32,14 +32,11 @@ class UserController {
       user.password = await bcrypt.hash(user.password, salt);
 
       await user.save();
-
-      const token = generateAccessToken(user._id);
-
-      res.status(200).json({ id: user._id, name, phoneNumber, email, token });
+      res.status(200).json({ message: "Registered successfully!" });
 
     } catch (error) {
-      console.log(error);
-      res.status(500).json('error');
+      // console.log(error);
+      res.status(500).json({ error: "Registration failed!" });
     }
   }
 
@@ -50,20 +47,20 @@ class UserController {
       const user = await UserModel.findOne({ phoneNumber });
 
       if (!user)
-        return res.status(401).json("Login Failed");
+        return res.status(401).json({ error: "Account does not exist..." });
 
       const isValidPassword = await bcrypt.compare(password, user.password);
 
       if (!isValidPassword)
-        return res.status(401).json("Invalid email or password");
+        return res.status(401).json({ error: "Invalid email or password..." });
 
       const token = generateAccessToken(user._id)
 
       res.status(200).json({ id: user._id, name: user.name, phoneNumber: user.phoneNumber, token });
 
     } catch (error) {
-      console.log(error)
-      res.status(500).json('error')
+      // console.log(error)
+      res.status(500).json({ error: "Login failed!" });
     }
   }
 
@@ -86,7 +83,7 @@ class UserController {
       // res.send(`Update user with ID ${userId}`);
       res.status(200).json({ message: 'Update user succeed' });
     } catch (error) {
-      console.error(error);
+      // console.error(error);
       res.status(500).json({ error: 'Internal Server Error' });
     }
   }
@@ -96,7 +93,7 @@ class UserController {
       await UserModel.findByIdAndDelete(req.params.id);
       res.status(200).json({ message: 'Delete user succeed' });
     } catch (error) {
-      console.error(error);
+      // console.error(error);
       res.status(500).json({ error: 'Internal Server Error' });
     }
   }
@@ -107,7 +104,18 @@ class UserController {
       const user = await UserModel.findById(userId);
       res.status(200).json({ id: user._id, name: user.name, phoneNumber: user.phoneNumber });
     } catch (error) {
-      console.error(error);
+      // console.error(error);
+      res.status(500).json({ error: 'Internal Server Error' });
+    }
+  }
+
+  async getUserByPhoneNumber(req, res) {
+    try {
+      const phoneNumber = req.params.phoneNumber;
+      const user = await UserModel.findOne({ phoneNumber: phoneNumber });
+      res.status(200).json({ id: user._id, name: user.name, phoneNumber: user.phoneNumber });
+    } catch (error) {
+      // console.error(error);
       res.status(500).json({ error: 'Internal Server Error' });
     }
   }
@@ -119,7 +127,7 @@ class UserController {
       const users = await UserModel.find();
       res.status(200).json(users);
     } catch (error) {
-      console.error(error);
+      // console.error(error);
       res.status(500).json({ error: 'Internal Server Error' });
     }
   }
