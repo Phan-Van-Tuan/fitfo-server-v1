@@ -47,12 +47,12 @@ class UserController {
       const user = await UserModel.findOne({ phoneNumber });
 
       if (!user)
-        return res.status(401).json({ error: "Account does not exist..." });
+        return res.status(400).json({ error: "Account does not exist..." });
 
       const isValidPassword = await bcrypt.compare(password, user.password);
 
       if (!isValidPassword)
-        return res.status(401).json({ error: "Invalid email or password..." });
+        return res.status(400).json({ error: "Invalid email or password..." });
 
       const token = generateAccessToken(user._id)
 

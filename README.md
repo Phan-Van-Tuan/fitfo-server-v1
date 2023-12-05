@@ -13,7 +13,7 @@ APP CHAT API
     - delete:               [DELETE] http://localhost:3200/api/users/delete/:id
     - update:               [PUT] http://localhost:3200/api/users/update/:id
     - get user by Id:       [GET] http://localhost:3200/api/users/getUserById
-    - get user by name:     [GET] http://localhost:3200/api/users/getUserByPhoneNumber
+    - get user by name:     [GET] http://localhost:3200/api/users/getUserByPhoneNumber/:phoneNumber
     - get all users:        [GET] http://localhost:3200/api/users/getAllUsers
 
     - create message:       [POST] http://localhost:3200/api/messages/
