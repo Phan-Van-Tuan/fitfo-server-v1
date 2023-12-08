@@ -1,16 +1,16 @@
 // Import necessary modules and libraries
 const express = require('express');
 const { createServer } = require('http');
-const { initSocket } = require('./app/sockets/chatSocket.js'); // Điều chỉnh đường dẫn nếu cần thiết
+const { initSocket } = require('./sockets/chatSocket.js'); // Điều chỉnh đường dẫn nếu cần thiết
 // const { join } = require('node:path');
 const cors = require('cors');
 
 // Load environment variables from a .env file
 require('dotenv').config();
 // Import database connection function
-const connectDB = require('./app/config/connectDB');
+const connectDB = require('./config/connectDB');
 // Import routes module
-const router = require('./app/routes');
+const router = require('./routes');
 
 // Get ... from environment variables
 const PORT = process.env.PORT || 3200;
