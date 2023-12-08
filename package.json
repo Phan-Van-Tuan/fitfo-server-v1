@@ -12,8 +12,6 @@
     "start": "node app/index.js",
     "dev": "nodemon app/index.js"
   },
-  "keywords": [],
-  "author": "",
   "dependencies": {
     "bcrypt": "^5.1.1",
     "cors": "^2.8.5",
