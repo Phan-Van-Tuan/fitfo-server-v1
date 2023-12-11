@@ -22,7 +22,7 @@ class MessageController {
     async getMessage(req, res) {
         const chatId = req.params.id;
         try {
-            const message = await MessageModel.findById(chatId);
+            const message = await MessageModel.find({ chatId: chatId });
             res.status(200).json(message);
         } catch (error) {
             console.log(error);
