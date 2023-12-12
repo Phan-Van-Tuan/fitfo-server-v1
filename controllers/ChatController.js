@@ -23,7 +23,7 @@ class ChatController {
     }
 
     async findUserChats(req, res) {
-        const userId = req.params.id;
+        const userId = req.params.userId;
         try {
             const chats = await ChatModel.find({
                 members: { $in: [userId] }
