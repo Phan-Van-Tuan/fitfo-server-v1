@@ -47,6 +47,17 @@ class ChatController {
             res.status(500).json(error);
         }
     }
+
+    async findChatById(req, res) {
+        const { chatId } = req.params;
+        try {
+            const chat = await ChatModel.findById(chatId);
+            res.status(200).json(chat);
+        } catch (error) {
+            console.error(error);
+            res.status(500).json(error);
+        }
+    }
 }
 
 module.exports = new ChatController;
