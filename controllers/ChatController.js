@@ -49,7 +49,7 @@ class ChatController {
     }
 
     async findChatById(req, res) {
-        const { chatId } = req.params;
+        const chatId = req.params.chatId;
         try {
             const chat = await ChatModel.findById(chatId);
             res.status(200).json(chat);
