@@ -20,8 +20,9 @@ APP CHAT API
     - get message:          [GET] http://localhost:3200/api/messages/:id
 
     - create chat:          [POST] http://localhost:3200/api/chats/
-    - find user chat:       [GET] http://localhost:3200/api/chats/:id
+    - find user chat:       [GET] http://localhost:3200/api/chats/:userId
     - find chat:            [GET] http://localhost:3200/api/chats/find/:firstId/:secondId
+    - find chat by Id:      [GET] http://localhost:3200/api/chats/findById/:chatId
 
 ## run
 
