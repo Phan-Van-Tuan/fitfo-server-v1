@@ -1,6 +1,8 @@
 const ChatModel = require('../models/ChatModel');
+const UserModel = require('../models/UserModel');
 
 class ChatController {
+    // single chat
     async createChat(req, res) {
         const { firstId, secondId } = req.body
         try {
@@ -9,8 +11,11 @@ class ChatController {
             });
             if (chat) return res.status(200).json(chat);
 
+            const user = await UserModel.findById(secondId);
+
             const newChat = new ChatModel({
-                members: [firstId, secondId]
+                members: [firstId, secondId],
+                chatName: user.name
             });
 
             const response = await newChat.save();
