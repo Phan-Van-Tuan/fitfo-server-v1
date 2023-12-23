@@ -2,12 +2,12 @@ const MessageModel = require('../models/MessageModel');
 
 class MessageController {
     async createMessage(req, res) {
-        const { chatId, senderId, text } = req.body;
+        const { chatId, senderId, title } = req.body;
 
         const message = new MessageModel({
             chatId,
             senderId,
-            text,
+            title,
         });
 
         try {
