@@ -26,7 +26,11 @@ const UserShema = new mongoose.Schema({
         minlength: 4,
         maxLength: 1024,
     },
-    
+    avatar: {
+        type: String,
+        default: "",
+    },
+
 },
     {
         timestamps: true,

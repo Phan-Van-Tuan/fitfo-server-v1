@@ -15,7 +15,8 @@ class ChatController {
 
             const newChat = new ChatModel({
                 members: [firstId, secondId],
-                chatName: user.name
+                chatName: user.name,
+                chatAvatar: user.avatar,
             });
 
             const response = await newChat.save();

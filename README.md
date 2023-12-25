@@ -1,34 +1,18 @@
 APP CHAT API
 
+- https://fitfo-api.vercel.app/api/
 - https://fitfo-api.onrender.com/api/
 
-# API
+# init
 
-    - test API:             [GET] http://localhost:3200/api/...
+    - git clone https://github.com/Phan-Van-Tuan/fitfo_API.git
+    - npm install
 
-    - test users route:     [GET] http://localhost:3200/api/users/...
-    - register:             [POST] http://localhost:3200/api/users/register
-    - login:                [POST] http://localhost:3200/api/users/login
-    - my profile:           [GET] http://localhost:3200/api/users/profile
-    - delete:               [DELETE] http://localhost:3200/api/users/delete/:id
-    - update:               [PUT] http://localhost:3200/api/users/update/:id
-    - get user by Id:       [GET] http://localhost:3200/api/users/getUserById
-    - get user by name:     [GET] http://localhost:3200/api/users/getUserByPhoneNumber/:phoneNumber
-    - get all users:        [GET] http://localhost:3200/api/users/getAllUsers
+### run
 
-    - create message:       [POST] http://localhost:3200/api/messages/
-    - get message:          [GET] http://localhost:3200/api/messages/:id
-
-    - create chat:          [POST] http://localhost:3200/api/chats/
-    - find user chat:       [GET] http://localhost:3200/api/chats/:userId
-    - find chat:            [GET] http://localhost:3200/api/chats/find/:firstId/:secondId
-    - find chat by Id:      [GET] http://localhost:3200/api/chats/findById/:chatId
-
-## run
-
+    - start: npm start
     - dev: npm run dev
 
-### init
+### API
 
-    - npm init -y
-    - npm install express socket.io mongoose
+    - test API:             [GET] http://localhost:3200/api/...

@@ -30,12 +30,14 @@ function initSocket(server) {
         // Add message
         socket.on('sendMessage', async (messageString) => {
             try {
+                console.log('1');
                 const message = JSON.parse(messageString);
                 if (!message || !message.chatId || !message.senderId || !message.title) {
                     // Xử lý lỗi nếu dữ liệu không hợp lệ
                     console.error('Invalid message format');
                     return;
                 }
+                
 
                 // Lấy thông tin về cuộc trò chuyện và populate mảng 'member'
                 const chat = await ChatModel.findById(message.chatId);
@@ -48,6 +50,7 @@ function initSocket(server) {
                     senderId: message.senderId,
                     title: message.title
                 });
+                console.log('2');
 
 
                 // Lưu tin nhắn vào cơ sở dữ liệu
