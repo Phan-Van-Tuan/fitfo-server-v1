@@ -11,6 +11,7 @@ class CommentController {
             const commentWithUserInfo = comments.map(comment => {
                 const user = users.find(user => user._id.toString() === comment.author);
                 return {
+                    _id: comment._id,
                     author: comment.author,
                     content: comment.content,
                     postId: comment.postId,

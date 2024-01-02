@@ -1,32 +1,49 @@
 const PostModel = require('../models/PostModel');
 const UserModel = require('../models/UserModel');
+const FriendshipModel = require('../models/FriendshipModel');
 
 class PostController {
     async getAllPosts(req, res) {
         try {
-            // Bước 1: Lấy danh sách bài viết
-            const posts = await PostModel.find();
+            const myId = req.params.myId;
 
-            // Bước 2: Tìm tất cả các idUser trong trường author của mỗi bài viết
-            const userIds = posts.map(post => post.author);
+            // get friendship list
+            const friendIds = await FriendshipModel.find({
+                $or: [{ user1: myId, accepted: true }, { user2: myId, accepted: true }]
+            });
+            // get userIds from model friendship and convert to array just id
+            const userIds = friendIds.flatMap(friend => [friend.user1, friend.user2]);
+            // remove Ids is same each other
+            const uniqueUserIds = [...new Set(userIds)];
 
-            // Bước 3: Sử dụng danh sách idUser để lấy thông tin avatar và name từ model User
-            const users = await UserModel.find({ _id: { $in: userIds } });
+            console.log(uniqueUserIds);
 
-            // Bước 4: Gộp thông tin người dùng vào mỗi bài viết
-            const postsWithUserInfo = posts.map(post => {
-                const user = users.find(user => user._id.toString() === post.author);
-                return {
-                    _id: post._id,
-                    author: post.author,
-                    userName: user.name,
-                    avatar: user.avatar,
-                    caption: post.caption,
-                    action: post.action,
-                    like: post.like,
-                    comment: post.comment,
-                    photo: post.photo,
-                };
+            // get post have author same id from uniqueUserIds
+            const posts = await Promise.all(uniqueUserIds.map(async (userId) => {
+                const userPosts = await PostModel.find({ author: userId });
+                return userPosts
+            }));
+
+            console.log(posts);
+
+
+            // return post with informatiopn
+            const postsWithUserInfo = posts.flatMap(postArray => {
+                return postArray.map(post => {
+                    const user = UserModel.findById(post.author)
+
+                    return {
+                        _id: post._id,
+                        author: post.author,
+                        userName: user ? user.name : '',
+                        avatar: user ? user.avatar : '',
+                        caption: post.caption,
+                        action: post.action,
+                        like: post.like,
+                        comment: post.comment,
+                        photo: post.photo,
+                    };
+                });
             });
 
             res.json(postsWithUserInfo);

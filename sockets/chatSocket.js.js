@@ -24,20 +24,20 @@ function initSocket(server) {
                     socketId: socket.id,
                 });
 
-            // console.log('onlineUsers', onlineUsers);
+            console.log('onlineUsers', onlineUsers);
         })
 
         // Add message
         socket.on('sendMessage', async (messageString) => {
             try {
-                console.log('1');
+                // console.log(messageString);
                 const message = JSON.parse(messageString);
                 if (!message || !message.chatId || !message.senderId || !message.title) {
                     // Xử lý lỗi nếu dữ liệu không hợp lệ
                     console.error('Invalid message format');
                     return;
                 }
-                
+
 
                 // Lấy thông tin về cuộc trò chuyện và populate mảng 'member'
                 const chat = await ChatModel.findById(message.chatId);
@@ -50,7 +50,7 @@ function initSocket(server) {
                     senderId: message.senderId,
                     title: message.title
                 });
-                console.log('2');
+                // console.log(newMessage);
 
 
                 // Lưu tin nhắn vào cơ sở dữ liệu
@@ -59,7 +59,7 @@ function initSocket(server) {
                         // Gửi tin nhắn và thông báo đến người nhận
                         users.forEach(user => {
                             // Your logic for each user
-                            io.to(user.socketId).emit('receivedMessage', savedMessage);
+                            // io.to(user.socketId).emit('receivedMessage', savedMessage);
                             console.log('3', user.socketId);
 
                             io.to(user.socketId).emit('getNotification', {

@@ -5,6 +5,7 @@ const messageRouter = require('./MessageRoute');
 const storyRouter = require('./StoryRoute');
 const PostRouter = require('./PostRoute');
 const CommentRouter = require('./CommentRoute');
+const FriendshipRouter = require('./FriendshipRoute');
 
 
 const router = express.Router();
@@ -27,6 +28,9 @@ router.use('/post/', (req, res) => { res.status(200).json("hello! this is post r
 
 router.use('/comment/', CommentRouter);
 router.use('/comment/', (req, res) => { res.status(200).json("hello! this is comment router") });
+
+router.use('/friendship/', FriendshipRouter);
+router.use('/friendship/', (req, res) => { res.status(200).json("hello! this is friendship router") });
 
 router.use('/', (req, res) => { res.status(200).send('Welcome to fitfo API') });
 

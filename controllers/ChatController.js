@@ -1,5 +1,4 @@
 const ChatModel = require('../models/ChatModel');
-const UserModel = require('../models/UserModel');
 
 class ChatController {
     // single chat
@@ -11,12 +10,10 @@ class ChatController {
             });
             if (chat) return res.status(200).json(chat);
 
-            const user = await UserModel.findById(secondId);
-
             const newChat = new ChatModel({
                 members: [firstId, secondId],
-                chatName: user.name,
-                chatAvatar: user.avatar,
+                chatName: "",
+                chatAvatar: "",
             });
 
             const response = await newChat.save();
