@@ -81,9 +81,24 @@ class UserController {
       // res.json(updatedUser);
       // const userId = req.params.id;
       // res.send(`Update user with ID ${userId}`);
-      res.status(200).json({ message: 'Update user succeed' });
+      res.status(200).json({ message: 'Updated user successfully' });
     } catch (error) {
       // console.error(error);
+      res.status(500).json({ error: 'Internal Server Error' });
+    }
+  }
+
+  async updateAvatar(req, res) {
+    try {
+      const userId = req.params.id;
+      const newAvatar = req.body.avatar;
+
+      // Sử dụng findByIdAndUpdate để cập nhật avatar của người dùng
+      await UserModel.findByIdAndUpdate(userId, { avatar: newAvatar }, { new: true });
+
+      res.status(200).json({ message: 'Updated avatar successfully' });
+    } catch (error) {
+      console.error('Lỗi khi cập nhật avatar:', error);
       res.status(500).json({ error: 'Internal Server Error' });
     }
   }
@@ -91,7 +106,7 @@ class UserController {
   async delete(req, res) {
     try {
       await UserModel.findByIdAndDelete(req.params.id);
-      res.status(200).json({ message: 'Delete user succeed' });
+      res.status(200).json({ message: 'Deleted user successfully' });
     } catch (error) {
       // console.error(error);
       res.status(500).json({ error: 'Internal Server Error' });
