@@ -1,4 +1,5 @@
 const FriendshipModel = require('../models/FriendshipModel');
+const UserModel = require('../models/UserModel');
 const ChatModel = require('../models/ChatModel');
 
 class FriendshipController {
@@ -62,7 +63,23 @@ class FriendshipController {
                     { accepted: true }
                 ]
             });
-            res.json(friendships);
+
+            const friendList = await Promise.all(friendships.map(async (friendship) => {
+                const friendUserId = friendship.user1 === userId ? friendship.user2 : friendship.user1;
+                const friendInfo = await UserModel.findById(friendUserId);
+                const chat = await ChatModel.findOne({
+                    members: { $all: [friendship.user1, friendship.user2] }
+                });
+
+                return {
+                    chatId: chat._id, // Đặt chatId là _id của mối quan hệ bạn bè
+                    name: friendInfo.name,
+                    avatar: friendInfo.avatar,
+                    userId: friendUserId,
+                };
+            }));
+
+            res.json(friendList);
         } catch (error) {
             console.error(error);
             res.status(500).send('Internal Server Error');

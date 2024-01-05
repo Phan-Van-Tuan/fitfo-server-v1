@@ -50,7 +50,7 @@ function initSocket(server) {
                     senderId: message.senderId,
                     title: message.title
                 });
-                // console.log(newMessage);
+                console.log(newMessage);
 
 
                 // Lưu tin nhắn vào cơ sở dữ liệu

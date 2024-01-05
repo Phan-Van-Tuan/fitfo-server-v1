@@ -10,7 +10,8 @@ router.get('/profile/', UserController.profile);
 router.post('/register/', UserController.register);
 router.post('/login/', UserController.login);
 router.put('/update/:id', UserController.update);
-router.patch('/updateAvater/:id', UserController.updateAvatar);
+router.put('/updatePassword/:id', UserController.updatePassword);
+router.patch('/updateAvatar/:id', UserController.updateAvatar);
 router.delete('/delete/:id', UserController.delete);
 
 module.exports = router;

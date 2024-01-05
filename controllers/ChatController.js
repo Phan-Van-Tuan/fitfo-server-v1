@@ -1,4 +1,5 @@
 const ChatModel = require('../models/ChatModel');
+const UserModel = require('../models/UserModel');
 
 class ChatController {
     // single chat
@@ -31,7 +32,28 @@ class ChatController {
             const chats = await ChatModel.find({
                 members: { $in: [userId] }
             });
-            res.status(200).json(chats);
+
+            const updatedChats = await Promise.all(chats.map(async (chat) => {
+                // Kiểm tra số thành viên trong mảng
+                if (chat.members.length > 2) {
+                    // Nếu có nhiều hơn 2 thành viên
+                } else {
+                    const otherMemberId = chat.members.find(memberId => memberId != userId);
+                    const otherMember = await UserModel.findById(otherMemberId);
+                    // Nếu có 2 thành viên
+                    if (chat.chatName == "" || chat.chatName == undefined) {
+                        // Nếu chatName rỗng, lấy tên của thành viên còn lại
+                        chat.chatName = otherMember.name;
+                    }
+
+                    if (chat.chatAvatar == "" || chat.chatAvatar == undefined) {
+                        // Nếu chatAvatar rỗng, lấy avatar của thành viên còn lại
+                        chat.chatAvatar = otherMember.avatar;
+                    }
+                }
+                return chat;
+            }));
+            res.status(200).json(updatedChats);
         } catch (error) {
             console.error(error);
             res.status(500).json(error);

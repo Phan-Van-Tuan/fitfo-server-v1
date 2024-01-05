@@ -56,7 +56,7 @@ class UserController {
 
       const token = generateAccessToken(user._id)
 
-      res.status(200).json({ id: user._id, name: user.name, phoneNumber: user.phoneNumber, token });
+      res.status(200).json({ id: user._id, name: user.name, avatar: user.avatar, phoneNumber: user.phoneNumber, token });
 
     } catch (error) {
       // console.log(error)
@@ -98,8 +98,47 @@ class UserController {
 
       res.status(200).json({ message: 'Updated avatar successfully' });
     } catch (error) {
-      console.error('Lỗi khi cập nhật avatar:', error);
+      // console.error('Lỗi khi cập nhật avatar:', error);
       res.status(500).json({ error: 'Internal Server Error' });
+    }
+  }
+
+  async updatePassword(req, res) {
+    try {
+      const userId = req.params.id;
+      const { currentPassword, newPassword } = req.body;
+
+      // Kiểm tra xem người dùng có tồn tại không
+      const user = await UserModel.findById(userId)
+
+      if (!user) {
+        return res.status(404).json({ error: "User not found..." });
+      }
+
+      // Kiểm tra xác thực mật khẩu hiện tại
+      const isPasswordValid = await bcrypt.compare(currentPassword, user.password);
+
+      if (!isPasswordValid) {
+        return res.status(401).json({ error: "Invalid current password..." });
+      }
+
+      // Kiểm tra mật khẩu mới có đủ mạnh không
+      if (!validator.isStrongPassword(newPassword)) {
+        return res.status(400).json({ error: "New password must be a strong password..." });
+      }
+
+      // Cập nhật mật khẩu mới
+      const salt = await bcrypt.genSalt(10);
+      user.password = await bcrypt.hash(newPassword, salt);
+
+      // Lưu lại người dùng cập nhật
+      await user.save();
+
+      res.status(200).json({ message: "Password updated successfully!" });
+
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: "Password update failed!" });
     }
   }
 
@@ -117,7 +156,7 @@ class UserController {
     try {
       const userId = req.params.id;
       const user = await UserModel.findById(userId);
-      res.status(200).json({ id: user._id, name: user.name, phoneNumber: user.phoneNumber });
+      res.status(200).json({ id: user._id, name: user.name, avatar: user.avatar, phoneNumber: user.phoneNumber });
     } catch (error) {
       // console.error(error);
       res.status(500).json({ error: 'Internal Server Error' });
@@ -128,7 +167,7 @@ class UserController {
     try {
       const phoneNumber = req.params.phoneNumber;
       const user = await UserModel.findOne({ phoneNumber: phoneNumber });
-      res.status(200).json({ id: user._id, name: user.name, phoneNumber: user.phoneNumber });
+      res.status(200).json({ id: user._id, name: user.name, avatar: user.avatar, phoneNumber: user.phoneNumber });
     } catch (error) {
       // console.error(error);
       res.status(500).json({ error: 'Internal Server Error' });

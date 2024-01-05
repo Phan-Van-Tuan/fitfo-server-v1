@@ -1,5 +1,6 @@
 const PostModel = require('../models/PostModel');
 const UserModel = require('../models/UserModel');
+const CommentModel = require('../models/CommentModel');
 const FriendshipModel = require('../models/FriendshipModel');
 
 class PostController {
@@ -15,38 +16,35 @@ class PostController {
             const userIds = friendIds.flatMap(friend => [friend.user1, friend.user2]);
             // remove Ids is same each other
             const uniqueUserIds = [...new Set(userIds)];
+            // console.log(uniqueUserIds);
 
-            console.log(uniqueUserIds);
+            const postsWithUserInfo = await Promise.all(
+                uniqueUserIds.flatMap(async (userId) => {
+                    const userPosts = await PostModel.find({ author: userId });
 
-            // get post have author same id from uniqueUserIds
-            const posts = await Promise.all(uniqueUserIds.map(async (userId) => {
-                const userPosts = await PostModel.find({ author: userId });
-                return userPosts
-            }));
+                    return Promise.all(userPosts.map(async (post) => {
+                        const user = await UserModel.findById(post.author);
+                        const commentCount = await CommentModel.countDocuments({ postId: post._id });
 
-            console.log(posts);
+                        return {
+                            _id: post._id,
+                            author: post.author,
+                            userName: user ? user.name : '',
+                            avatar: user ? user.avatar : '',
+                            caption: post.caption,
+                            action: post.action,
+                            like: post.like,
+                            comment: commentCount,
+                            photo: post.photo,
+                        };
+                    }));
+                })
+            );
 
+            // Flattening the result array
+            const flattenedPosts = postsWithUserInfo.flat();
 
-            // return post with informatiopn
-            const postsWithUserInfo = posts.flatMap(postArray => {
-                return postArray.map(post => {
-                    const user = UserModel.findById(post.author)
-
-                    return {
-                        _id: post._id,
-                        author: post.author,
-                        userName: user ? user.name : '',
-                        avatar: user ? user.avatar : '',
-                        caption: post.caption,
-                        action: post.action,
-                        like: post.like,
-                        comment: post.comment,
-                        photo: post.photo,
-                    };
-                });
-            });
-
-            res.json(postsWithUserInfo);
+            res.json(flattenedPosts);
         } catch (error) {
             res.status(500).json({ error: error.message });
         }
@@ -56,17 +54,34 @@ class PostController {
         const userId = req.params.userId;
         try {
             const posts = await PostModel.find({ author: userId });
-            res.json(posts);
-        } catch (error) {
+            const user = await UserModel.findById(userId);
+            const result = await Promise.all(posts.map(async (post) => {
+                const commentCount = await CommentModel.countDocuments({ postId: post._id });
+
+                return {
+                    _id: post._id,
+                    author: post.author,
+                    userName: user ? user.name : '',
+                    avatar: user ? user.avatar : '',
+                    caption: post.caption,
+                    action: post.action,
+                    like: post.like,
+                    comment: commentCount,
+                    photo: post.photo,
+                };
+            }));
+            res.json(result);
+        }
+        catch (error) {
             res.status(500).json({ error: error.message });
         }
     }
 
     async createPost(req, res) {
-        const { author, caption, action, like, photo } = req.body;
+        const { author, caption, action, photo } = req.body;
 
         try {
-            const newPost = new PostModel({ author, caption, action, like, photo });
+            const newPost = new PostModel({ author, caption, action, photo });
             await newPost.save();
             res.status(200).json("Post created successfully");
         } catch (error) {

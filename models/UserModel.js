@@ -28,7 +28,7 @@ const UserShema = new mongoose.Schema({
     },
     avatar: {
         type: String,
-        default: "",
+        default: "https://firebasestorage.googleapis.com/v0/b/fitfo-storage.appspot.com/o/avatars%2Flogo_default.png?alt=media&token=7d6ef2a3-383d-430d-a94c-89e272ae1dea",
     },
 
 },
