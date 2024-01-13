@@ -36,6 +36,7 @@ class PostController {
                             like: post.like,
                             comment: commentCount,
                             photo: post.photo,
+                            createdAt: post.createdAt
                         };
                     }));
                 })
@@ -68,6 +69,7 @@ class PostController {
                     like: post.like,
                     comment: commentCount,
                     photo: post.photo,
+                    createdAt: post.createdAt
                 };
             }));
             res.json(result);
@@ -98,6 +100,22 @@ class PostController {
             res.status(500).json({ error: error.message });
         }
     }
+
+    async updatePostLikes(req, res) {
+        const { like } = req.body;
+
+        try {
+            await PostModel.findByIdAndUpdate(
+                req.params.postId,
+                { $set: { like: like } },
+                { new: true }
+            );
+            res.status(200).json("Likes updated successfully");
+        } catch (error) {
+            res.status(500).json({ error: error.message });
+        }
+    }
+
 
     async deletePost(req, res) {
         try {

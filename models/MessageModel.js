@@ -5,6 +5,7 @@ const messageSchema = new mongoose.Schema(
         chatId: String,
         senderId: String,
         title: String,
+        type: { type: String, default: "message" }
     },
     {
         timestamps: true,

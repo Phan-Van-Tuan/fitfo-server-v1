@@ -18,11 +18,11 @@ function initSocket(server) {
         // Listen to a connection
         console.log("new connection ", socket.id);
         socket.on('addNewUser', (userId) => {
-            !onlineUsers.some((user) => user.userId === userId) &&
-                onlineUsers.push({
-                    userId,
-                    socketId: socket.id,
-                });
+            // !onlineUsers.some((user) => user.userId === userId) &&
+            onlineUsers.push({
+                userId,
+                socketId: socket.id,
+            });
 
             console.log('onlineUsers', onlineUsers);
         })
@@ -32,14 +32,11 @@ function initSocket(server) {
             try {
                 // console.log(messageString);
                 const message = JSON.parse(messageString);
-                if (!message || !message.chatId || !message.senderId || !message.title) {
+                if (!message || !message.chatId || !message.senderId || !message.title || !message.type) {
                     // Xử lý lỗi nếu dữ liệu không hợp lệ
                     console.error('Invalid message format');
                     return;
                 }
-
-
-                // Lấy thông tin về cuộc trò chuyện và populate mảng 'member'
                 const chat = await ChatModel.findById(message.chatId);
                 // Lấy mảng các người nhận
                 const recipientIds = chat.members;
@@ -48,9 +45,11 @@ function initSocket(server) {
                 const newMessage = new MessageModel({
                     chatId: message.chatId,
                     senderId: message.senderId,
-                    title: message.title
+                    title: message.title,
+                    type: message.type
+
                 });
-                console.log(newMessage);
+                // console.log(newMessage);
 
 
                 // Lưu tin nhắn vào cơ sở dữ liệu
@@ -59,11 +58,12 @@ function initSocket(server) {
                         // Gửi tin nhắn và thông báo đến người nhận
                         users.forEach(user => {
                             // Your logic for each user
-                            // io.to(user.socketId).emit('receivedMessage', savedMessage);
-                            console.log('3', user.socketId);
+                            io.to(user.socketId).emit('receivedMessage', savedMessage);
+                            // console.log('3', user.socketId);
 
                             io.to(user.socketId).emit('getNotification', {
                                 senderId: message.senderId,
+                                chatId: message.chatId,
                                 isRead: false,
                                 date: new Date(),
                             });
@@ -99,6 +99,7 @@ function initSocket(server) {
         // Xử lý sự kiện khi người dùng ngắt kết nối
         socket.on('disconnect', () => {
             onlineUsers = onlineUsers.filter((user) => user.socketId !== socket.id);
+            console.log('new', onlineUsers);
         });
     });
 

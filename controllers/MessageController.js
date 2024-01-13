@@ -22,7 +22,9 @@ class MessageController {
     async getMessage(req, res) {
         const chatId = req.params.id;
         try {
-            const message = await MessageModel.find({ chatId: chatId });
+            const message = await MessageModel.find({ chatId: chatId })
+                .sort({ createdAt: -1 }) // Sắp xếp theo thời gian giảm dần (mới nhất lên đầu)
+                .limit(100); // Giới hạn số lượng kết quả trả về
             res.status(200).json(message);
         } catch (error) {
             console.log(error);

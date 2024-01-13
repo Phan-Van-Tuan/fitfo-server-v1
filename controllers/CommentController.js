@@ -17,6 +17,7 @@ class CommentController {
                     postId: comment.postId,
                     avatar: user.avatar,
                     userName: user.name,
+                    createdAt: comment.createdAt
                 }
             });
             res.status(200).json(commentWithUserInfo);
