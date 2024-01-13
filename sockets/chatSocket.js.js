@@ -62,10 +62,12 @@ function initSocket(server) {
                             // console.log('3', user.socketId);
 
                             io.to(user.socketId).emit('getNotification', {
-                                senderId: message.senderId,
-                                chatId: message.chatId,
+                                latestSenderId: savedMessage.senderId,
+                                chatId: savedMessage.chatId,
+                                latestMessage: savedMessage.title,
+                                latestType: savedMessage.type,
                                 isRead: false,
-                                date: new Date(),
+                                latestSend: savedMessage.createdAt,
                             });
                         });
                     })
